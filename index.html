@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>MAP76 UI Dev Sandbox</title>
+    <link rel="stylesheet" href="style.css">
+
+    <script>
+        window.__f4seCache = null;
+        window.__f4seAssetCache = null;
+        window.__f4seLocaleCache = null;
+
+        window.MapInterop = {
+            loadMarkers: function (jsonString) {
+                console.log('[HTML Inline Stub] InteropCall routed to MapInterop.loadMarkers');
+                if (window.__loadMarkersRegister) {
+                    window.__loadMarkersRegister(jsonString);
+                } else {
+                    console.log('[HTML Inline Stub] Bundle not ready. Caching payload...');
+                    window.__f4seCache = jsonString;
+                }
+            },
+            loadAssets: function (jsonString) {
+                console.log('[HTML Inline Stub] InteropCall routed to MapInterop.loadAssets');
+                if (window.__loadAssetsRegister) {
+                    window.__loadAssetsRegister(jsonString);
+                } else {
+                    console.log('[HTML Inline Stub] Bundle not ready. Caching asset payload...');
+                    window.__f4seAssetCache = jsonString;
+                }
+            },
+            loadLocales: function (jsonString) {
+                console.log('[HTML Inline Stub] InteropCall routed to MapInterop.loadLocales');
+                if (window.__loadLocalesRegister) {
+                    window.__loadLocalesRegister(jsonString);
+                } else {
+                    console.log('[HTML Inline Stub] Bundle not ready. Caching locale payload...');
+                    window.__f4seLocaleCache = jsonString;
+                }
+            }
+        };
+
+        window.loadMarkers = window.MapInterop.loadMarkers;
+        window.loadAssets = window.MapInterop.loadAssets;
+        window.loadLocales = window.MapInterop.loadLocales;
+    </script>
+
+    <script type="module" src="src/main.js"></script>
+</head>
+
+<body>
+    <div id="screen-container">
+        <div id="map-viewport">
+            <div id="map-bg-container">
+                <img src="assets/maps/commonwealth/default.png" id="map-bg" class="map-bg-layer active" draggable="false" />
+            </div>
+            <div id="marker-layer"></div>
+            <div id="quest-layer"></div>
+            <div id="player-layer"></div>
+        </div>
+        <div id="global-nametag-container" style="position: absolute; pointer-events: none; z-index: 1000; left: 0; top: 0;">
+            <div id="global-nametag"></div>
+        </div>
+    </div>
+
+    <div id="settings-bar"></div>
+    <div id="info-bar"></div>
+    <div id="control-bar"></div>
+    <div id="info-card"></div>
+    <div id="quest-list-panel"></div>
+    <div id="workshop-list-panel"></div>
+    <div id="search-panel"></div>
+</body>
+
+</html>

@@ -1,0 +1,1601 @@
+/* ==========================================================================
+   1. GLOBAL RESETS & BASE CANVAS LAYOUT
+   ========================================================================== */
+
+:root {
+    --selected-marker-filter: none;
+    --selected-status-filter: invert(1);
+    --ui-scale: 1.0;
+}
+
+* {
+    box-sizing: border-box;
+    user-select: none;
+}
+
+@font-face {
+    font-family: 'ControllerButtons';
+    src: url('/assets/fonts/Controller_Buttons_Controller.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ControllerButtonsInverted';
+    src: url('/assets/fonts/Controller_Buttons_inverted_Controller.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'PibotoCondensed';
+    src: url('/assets/fonts/fonts-piboto-1.2/PibotoCondensed-Regular.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'PibotoCondensed';
+    src: url('/assets/fonts/fonts-piboto-1.2/PibotoCondensed-Bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'PibotoCondensed';
+    src: url('/assets/fonts/fonts-piboto-1.2/PibotoCondensed-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'PibotoCondensed';
+    src: url('/assets/fonts/fonts-piboto-1.2/PibotoCondensed-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-Bold.ttf') format('truetype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-Light.ttf') format('truetype');
+    font-weight: 300;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-LightItalic.ttf') format('truetype');
+    font-weight: 300;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-Thin.ttf') format('truetype');
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: 'Piboto';
+    src: url('/assets/fonts/fonts-piboto-1.2/Piboto-ThinItalic.ttf') format('truetype');
+    font-weight: 100;
+    font-style: italic;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(10, 10, 10);
+    overflow: hidden;
+}
+
+#screen-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+
+/* ==========================================================================
+   2. VIEWPORT & BACKGROUND CANVAS LAYER
+   ========================================================================== */
+
+#map-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vmax;
+    height: 100vmax;
+    transform-origin: 0 0;
+    cursor: grab;
+    pointer-events: auto;
+}
+
+#map-bg-container {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+#map-bg,
+#map-bg-container svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.map-bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.map-bg-layer.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+
+/* ==========================================================================
+   3. MAP MARKER LAYERS & ELEMENTS
+   ========================================================================== */
+
+#marker-layer,
+#quest-layer,
+#player-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#player-layer {
+    pointer-events: none;
+}
+
+#quest-layer {
+    pointer-events: none;
+}
+
+.marker-container {
+    position: absolute;
+    transform-origin: center center !important;
+    pointer-events: auto !important;
+    display: block;
+    width: 0;
+    height: 0;
+    transform: scale(calc(var(--marker-scale, 1.0) * var(--marker-size-mult, 1.0)));
+}
+
+.marker-container svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    transform-origin: center center !important;
+    display: block;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.marker-container.is-hovered,
+.marker-container.menu-active {
+    z-index: 100 !important;
+    transform: scale(calc(var(--marker-scale, 1.0) * var(--marker-size-mult, 1.0) * 1.35));
+}
+
+.force-top {
+    z-index: 110 !important;
+}
+
+.marker-container[data-marker-type="location"] {
+    z-index: 10;
+}
+
+.marker-container[data-marker-type="location"] svg {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.quest-marker svg,
+.custom-marker svg,
+.power-armor-marker svg {
+    width: 28px;
+    height: 34px;
+    object-fit: contain;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.quest-marker svg {
+    width: 20px;
+    height: 20px;
+}
+
+.power-armor-marker svg {
+    width: 20px;
+    height: 21px;
+}
+
+.player-marker-vector {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+}
+
+.player-marker-vector svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.icon-wrapper svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.power-armor-marker {
+    z-index: 20;
+}
+
+.custom-marker {
+    z-index: 30;
+}
+
+.quest-marker {
+    z-index: 40;
+}
+
+#player-marker {
+    z-index: 50;
+    transform: translate(-50%, -50%) scale(calc(var(--marker-scale, 1.0) * var(--marker-size-mult, 1.0))) rotate(var(--player-angle, 0deg));
+}
+
+
+/* ==========================================================================
+   4. NAMETAG TOOLTIPS
+   ========================================================================== */
+
+#global-nametag {
+    position: absolute;
+    left: 0;
+    transform: translate(-50%, 0);
+    color: #ffffcb;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 20px;
+    text-shadow: 1.5px 1.5px 0 rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    zoom: var(--ui-scale, 1.0);
+}
+
+#global-nametag.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+#map-viewport:has(.marker-container.menu-active) ~ #global-nametag-container #global-nametag,
+#map-viewport:has(.marker-container.hide-tooltip-override) ~ #global-nametag-container #global-nametag {
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+
+/* ==========================================================================
+   5. MODALS
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    pointer-events: auto;
+}
+
+.modal-box {
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid #e0c870;
+    color: #e0c870;
+    padding: 30px;
+    width: max-content;
+    min-width: 400px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+    zoom: var(--ui-scale, 1.0);
+}
+
+#modal-text {
+    color: #e0c870;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 20px;
+    line-height: 1.4;
+    margin: 0;
+    text-transform: none;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.modal-actions.modal-vertical {
+    flex-direction: column;
+    width: 100%;
+}
+
+.modal-actions .btn {
+    padding: 0 20px;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: background 0.1s ease;
+    height: 26px;
+}
+
+.modal-actions .btn:hover,
+.modal-actions .btn:focus,
+.modal-actions .btn.selected {
+    background: #f5cb5b;
+}
+
+
+
+.modal-actions .btn .btn-text {
+    color: #f5cb5b;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 13px;
+}
+
+.modal-actions .btn:hover .btn-text,
+.modal-actions .btn:focus .btn-text,
+.modal-actions .btn.selected .btn-text {
+    color: #000;
+}
+
+
+/* ==========================================================================
+   6. CUSTOM POINTER CURSOR
+   ========================================================================== */
+
+#custom-cursor {
+    position: fixed;
+    width: 3vh;
+    height: 3vh;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 20000;
+    display: none;
+    transform-origin: 50% 0%;
+}
+
+#custom-cursor.map {
+    width: 5vh;
+    height: 5vh;
+    transform: translate(-50%, -50%);
+    z-index: 120;
+}
+
+
+/* ==========================================================================
+   7. SUPPLY LINES
+   ========================================================================== */
+
+#supply-lines-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    display: none;
+}
+
+#supply-lines-layer.is-active {
+    display: block;
+}
+
+.supply-line {
+    stroke: #ffffff;
+    stroke-width: 2.5;
+    stroke-dasharray: 6 4;
+    opacity: 0.85;
+}
+
+/* ==========================================================================
+   8. INFO CARD
+   ========================================================================== */
+
+#info-card {
+    position: absolute;
+    z-index: 1000;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 28px;
+    color: #ffffcb;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    text-shadow: 2px 2px 0 rgba(0, 0, 0, 1);
+    text-align: left;
+}
+
+#info-card .info-row {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+}
+
+#info-card img.info-icon {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 1));
+}
+
+#info-card .info-value {
+    color: #ffffcb;
+    font-weight: bold;
+}
+
+#info-card .info-value.overburdened {
+    color: #ff4d4d;
+}
+
+
+/* ==========================================================================
+   9. COLLAPSIBLE PANEL
+   ========================================================================== */
+
+.collapsible-panel {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    pointer-events: auto;
+    color: #ffffcb;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+}
+
+.collapsible-panel[data-collapsed="true"] {
+    height: auto;
+}
+
+.collapsible-panel .cp-btn-icon {
+    font-family: 'ControllerButtons', sans-serif;
+}
+
+.collapsible-panel .cp-collapse-btn:hover .cp-btn-icon {
+    font-family: 'ControllerButtonsInverted', sans-serif;
+}
+
+body.controller-active .collapsible-panel .cp-btn-icon {
+    font-family: 'ControllerButtonsInverted', sans-serif;
+}
+
+body.controller-active .collapsible-panel .cp-collapse-btn:hover .cp-btn-icon {
+    font-family: 'ControllerButtons', sans-serif;
+}
+
+.collapsible-panel .cp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 7px;
+    background-color: rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+}
+
+.collapsible-panel .cp-title {
+    color: #f5cb5b;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 1.2;
+    position: relative;
+    text-shadow: 1.5px 1.5px 0 #000000;
+}
+
+.collapsible-panel .cp-collapse-btn {
+    display: flex;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    cursor: pointer;
+}
+
+.collapsible-panel .cp-collapse-text {
+    color: #ffffcb;
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 1.2;
+    position: relative;
+    text-shadow: 1.5px 1.5px 0 #000000;
+}
+
+.collapsible-panel .cp-collapse-btn .cp-btn-icon {
+    color: #ffffcb;
+    font-size: 16px;
+    line-height: 1.2;
+    position: relative;
+    text-shadow: 1.5px 1.5px 0 #000000;
+}
+
+.collapsible-panel.dimmed {
+    filter: brightness(0.4);
+    transition: filter 0.15s ease;
+}
+
+
+/* ==========================================================================
+   10. TAB BAR
+   ========================================================================== */
+
+.tb-sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 30px;
+    padding: 0 20px;
+    background-color: rgba(0, 0, 0, 0.75);
+    flex-shrink: 0;
+}
+
+.collapsible-panel[data-collapsed="true"] .tb-sub-header {
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
+.tb-sub-header .tb-nav-icon {
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    color: #ffffcb;
+    font-size: 16px;
+    line-height: 1.2;
+    position: relative;
+    text-shadow: 1.5px 1.5px 0 #000000;
+}
+
+.tb-tabs-bar {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    gap: 10px;
+    width: 100%;
+    height: 20px;
+    padding: 0 20px
+}
+
+.tb-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20px;
+    padding: 4px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tb-tab.active {
+    background-color: #f5cb5b;
+}
+
+.tb-tab-text {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1.2;
+    color: #f5cb5b;
+}
+
+.tb-tab.active .tb-tab-text {
+    color: #000000;
+}
+
+
+/* ==========================================================================
+   11. SELECTABLE LIST
+   ========================================================================== */
+
+.selectable-list[data-collapsed="true"] .sl-body {
+    height: auto;
+    max-height: 372px;
+}
+
+.selectable-list[data-collapsed="true"] .sl-items-list {
+    max-height: 362px;
+}
+
+.selectable-list .sl-body {
+    display: flex;
+    padding: 5px;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+    height: calc(100% - 60px);
+    background-color: rgba(24, 28, 29, 0.5);
+    overflow: hidden;
+}
+
+.selectable-list .sl-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex: 1;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.selectable-list .sl-items-list::-webkit-scrollbar {
+    display: none;
+}
+
+.selectable-list .sl-empty {
+    color: #ffffcb;
+    opacity: 0.6;
+    padding: 10px;
+    font-size: 16px;
+    text-align: center;
+    width: 100%;
+}
+
+.selectable-list .sl-item {
+    display: flex;
+    flex-shrink: 0;
+    padding: 12px;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 35px;
+    min-height: 35px;
+    background-color: #181c1d;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.selectable-list .sl-item.selected {
+    background-color: #f5cb5b;
+    border-color: #f5cb5b;
+}
+
+.selectable-list .sl-item.selected .sl-item-title,
+.selectable-list .sl-item.selected .sl-item-subtitle {
+    color: #000000;
+    text-shadow: none;
+}
+
+.selectable-list .sl-item.selected .sl-marker-box.active {
+    background-color: #000000;
+}
+
+.selectable-list.focused {
+    outline: 1px solid rgba(245, 203, 91, 0.4);
+}
+
+.selectable-list .sl-item-content {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 25px;
+}
+
+.selectable-list .sl-marker-box {
+    position: relative;
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    background-color: transparent;
+}
+
+.selectable-list .sl-marker-box.active {
+    background-color: rgba(255, 255, 203, 0.75);
+}
+
+.selectable-list .sl-item-title {
+    color: #ffffcb;
+    font-size: 18px;
+    line-height: 1.2;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.selectable-list .sl-item.completed {
+    opacity: 0.75;
+}
+
+.selectable-list .sl-separator {
+    position: relative;
+    margin: 5px 0;
+    width: 100%;
+    height: 2px;
+    min-height: 2px;
+    background-color: #262626;
+}
+
+.selectable-list .sl-scrollbar {
+    position: relative;
+    width: 10px;
+    height: auto;
+    align-self: stretch;
+    background-color: rgba(24, 28, 29, 0.5);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.selectable-list .sl-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background-color: rgba(255, 255, 203, 0.75);
+}
+
+.selectable-list .sl-item.selected .wl-subtitle {
+    color: #000000;
+}
+
+.selectable-list .sl-item.selected .wl-marker-icon {
+    filter: var(--selected-marker-filter);
+}
+
+.selectable-list .sl-item.selected .wl-status-badge {
+    filter: var(--selected-status-filter);
+}
+
+/* ==========================================================================
+   12. FLOATING CARD
+   ========================================================================== */
+
+.floating-card {
+    position: fixed;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    pointer-events: auto;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    color: #ffffcb;
+    background-color: rgba(24, 28, 29, 0.95);
+    border: 1px solid rgba(255, 255, 203, 0.2);
+    box-shadow: -4px 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.floating-card[data-anchored]::before,
+.floating-card.focused {
+    outline: 1px solid rgba(245, 203, 91, 0.4);
+}
+
+.fc-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 10px;
+    background-color: rgba(0, 0, 0, 0.75);
+    box-sizing: border-box;
+}
+
+.fc-title {
+    color: #f5cb5b;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 1.2;
+    text-shadow: 1.5px 1.5px 0 #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fc-body {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    gap: 12px;
+    overflow-y: auto;
+    max-height: 440px;
+}
+
+.fc-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fc-section-title {
+    color: #f5cb5b;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1.2;
+    text-shadow: 1px 1px 0 #000000;
+    margin-bottom: 4px;
+}
+
+.fc-section-box {
+    background-color: #181c1d;
+    padding: 8px 10px;
+    border-radius: 2px;
+}
+
+.fc-section-text {
+    color: #ffffcb;
+    font-size: 16px;
+    line-height: 1.3;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.fc-bottom-bar-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+    padding: 6px 8px;
+    background-color: rgba(0, 0, 0, 0.75);
+    box-sizing: border-box;
+}
+
+.fc-bottom-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: auto;
+    background-color: transparent;
+    gap: 6px;
+}
+
+
+/* ==========================================================================
+   BUTTON
+   ========================================================================== */
+
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 26px;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 20px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.btn:hover,
+.btn.selected,
+.btn:focus {
+    background-color: #f5cb5b;
+}
+
+.btn-text {
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 1.1;
+    color: #f5cb5b;
+    text-align: center;
+    white-space: nowrap;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+}
+
+.btn:hover .btn-text,
+.btn.selected .btn-text,
+.btn:focus .btn-text {
+    color: #000000;
+}
+
+.btn.selected,
+.btn:focus {
+    background-color: #f5cb5b;
+    outline: none;
+}
+
+.btn.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.btn-large {
+    height: 40px;
+}
+
+.btn-large .btn-text {
+    font-size: 16px;
+}
+
+
+/* ==========================================================================
+   13. STATUS ITEM LIST
+   ========================================================================== */
+
+.status-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 125px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 203, 0.4) transparent;
+}
+
+.status-item-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.status-item-list::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 203, 0.4);
+    border-radius: 3px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background-color: #101314;
+    font-size: 15px;
+    color: #ffffcb;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.status-item-text {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.status-item.completed,
+.status-item.failed {
+    opacity: 0.6;
+}
+
+.status-item-icon {
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.status-item.completed .status-item-icon {
+    color: #f5cb5b;
+}
+
+.status-item.failed .status-item-icon {
+    color: #ff4d4d;
+}
+
+
+/* ==========================================================================
+   14. WORKSHOP STATS COMPONENT
+   ========================================================================== */
+
+.wc-stats-box {
+    background-color: #181c1d;
+    padding: 8px 10px;
+    border-radius: 2px;
+}
+
+.wc-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    row-gap: 6px;
+    column-gap: 12px;
+}
+
+.wc-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 22px;
+}
+
+.wc-stat-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 203, 0.4));
+    flex-shrink: 0;
+}
+
+.wc-stat-value {
+    font-size: 15px;
+    font-weight: bold;
+    color: #ffffcb;
+    line-height: 1;
+}
+
+.wc-status-badge {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-left: -2px;
+}
+
+/* ==========================================================================
+   15. SEARCH PANEL
+   ========================================================================== */
+
+#search-panel {
+    min-width: 350px;
+    max-width: 500px;
+    width: max-content;
+}
+
+#search-panel[data-collapsed="true"] {
+    height: auto;
+    max-height: 30px;
+}
+
+#search-panel[data-collapsed="true"] .sl-body,
+#search-panel[data-collapsed="true"] .sp-search-bar-container {
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
+#search-panel[data-collapsed="false"] {
+    height: 402px;
+}
+
+.search-box-wrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.search-box-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    color: #ffffcb;
+    padding: 4px 60px 4px 8px;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 16px;
+    outline: none;
+    margin: 4px 0;
+}
+
+.search-box-input::placeholder {
+    color: #ffffcb;
+    opacity: 0.5;
+}
+
+.search-box-input:focus {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(245, 203, 91, 0.4);
+}
+
+.search-box-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    font-weight: bold;
+    display: none;
+    padding: 2px 6px;
+    outline: none;
+    user-select: none;
+}
+
+.search-box-clear-btn:focus, .search-box-clear-btn:hover {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(245, 203, 91, 0.4);
+    color: #ffffcb;
+}
+
+#search-panel[data-input-focused="true"] .cp-collapse-btn {
+    opacity: 0.4;
+    transition: opacity 0.15s ease;
+}
+
+#search-panel[data-input-focused="true"] .cp-collapse-btn:hover {
+    opacity: 1;
+}
+
+body.has-active-focus .collapsible-panel:not(.focused) .cp-collapse-btn {
+    opacity: 0.4;
+    transition: opacity 0.15s ease;
+}
+
+body.has-active-focus .collapsible-panel:not(.focused) .cp-collapse-btn:hover {
+    opacity: 1;
+}
+
+
+/* ==========================================================================
+   SETTINGS MENU
+   ========================================================================== */
+
+#settings-menu-panel {
+    position: absolute;
+    top: calc(20vh / var(--ui-scale, 1.0));
+    right: calc(20vw / var(--ui-scale, 1.0));
+    width: calc(80vw / var(--ui-scale, 1.0));
+    height: calc(80vh / var(--ui-scale, 1.0));
+    zoom: var(--ui-scale, 1.0);
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+body.is-ultralight #settings-menu-panel {
+    top: 20vh;
+    right: 20vw;
+    width: 80vw;
+    height: 80vh;
+}
+
+#settings-menu-panel.panel-hidden,
+#settings-backdrop.panel-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.settings-body {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    overflow: hidden;
+}
+
+.settings-tabs {
+    flex: 0 0 calc(400px / var(--ui-scale, 1.0));
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 15px;
+    gap: 10px;
+}
+
+.settings-tab {
+    padding: 10px 15px;
+    font-size: 24px;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    color: #ffffcb;
+    outline: none;
+}
+
+.settings-tab.active {
+    opacity: 1;
+    background-color: #f5cb5b;
+    color: #000;
+}
+
+.settings-tab:focus {
+    background-color: #f5cb5b;
+    color: #000;
+}
+
+.settings-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#settings-backdrop {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9998;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+body.settings-open > :not(#settings-menu-panel):not(#settings-backdrop):not(#screen-container):not(script):not(#custom-cursor):not(.modal-overlay):not(#control-bar) {
+    display: none !important;
+}
+body.settings-open #marker-layer,
+body.settings-open #quest-layer,
+body.settings-open #player-layer {
+    display: none !important;
+}
+
+/* ==========================================================================
+   SETTINGS ROW PRIMITIVES
+   ========================================================================== */
+
+.settings-row {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    align-items: center;
+    padding: 6px 10px;
+    background-color: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+}
+
+.settings-row:focus {
+    outline: none;
+    background-color: #f5cb5b;
+}
+
+.settings-row:focus .settings-row-title,
+.settings-row:focus .settings-row-subtitle,
+.settings-row:focus .ui-control-value {
+    color: #000000;
+}
+
+.settings-row-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-row-title {
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffcb;
+}
+
+.settings-row-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 15px;
+}
+
+
+/* ==========================================================================
+   STEPPER CONTROL
+   ========================================================================== */
+
+.stepper-control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.stepper-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.stepper-arrow-left {
+    border-width: 6px 10px 6px 0;
+    border-color: transparent #ffffcb transparent transparent;
+}
+.stepper-arrow-right {
+    border-width: 6px 0 6px 10px;
+    border-color: transparent transparent transparent #ffffcb;
+}
+.stepper-arrow:hover { opacity: 1; }
+.stepper-arrow:active { transform: scale(0.9); }
+
+.settings-row:focus .stepper-arrow-left {
+    border-color: transparent #000000 transparent transparent;
+}
+.settings-row:focus .stepper-arrow-right {
+    border-color: transparent transparent transparent #000000;
+}
+
+.ui-control-value {
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 20px;
+    color: #ffffcb;
+    min-width: 60px;
+    text-align: center;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+
+/* ==========================================================================
+   SLIDER
+   ========================================================================== */
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+}
+.slider-track-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+.slider-track {
+    flex-grow: 1;
+    width: 100%;
+    height: 4px;
+    background: #ffffcb;
+    position: relative;
+    cursor: pointer;
+}
+.slider-fill {
+    height: 100%;
+    background: #ffffcb;
+    width: 50%;
+}
+.slider-thumb {
+    width: 8px;
+    height: 16px;
+    background: #ffffcb;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+.settings-row:focus .slider-fill,
+.settings-row:focus .slider-thumb,
+.settings-row:focus .slider-track {
+    background: #000000;
+}
+
+/* ==========================================================================
+   BARS (INFO, SETTINGS, CONTROL)
+   ========================================================================== */
+
+#settings-bar,
+#info-bar,
+#control-bar {
+    position: absolute;
+    height: 30px;
+    background-color: rgba(24, 28, 29, 0.5);
+    color: #ffffcb;
+    font-family: var(--main-font, 'PibotoCondensed', sans-serif);
+    font-size: 18px;
+    line-height: 1.2;
+    padding: 0 10px;
+    white-space: pre;
+    z-index: 10000;
+    pointer-events: none;
+    zoom: var(--ui-scale, 1.0);
+    display: flex;
+    align-items: center;
+}
+
+#settings-bar {
+    top: 10px;
+    left: 10px;
+}
+
+#info-bar {
+    top: 10px;
+    right: 10px;
+}
+
+#control-bar {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+
+/* ==========================================================================
+   CUSTOM
+   ========================================================================== */
+
+#quest-list-panel {
+    min-width: 450px;
+    max-width: 600px;
+    width: max-content;
+    height: auto;
+    max-height: 75vh;
+}
+
+#quest-list-panel .sl-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto !important;
+    max-height: none !important;
+    align-items: stretch !important;
+}
+
+#quest-list-panel.height-limited {
+    max-height: 402px !important;
+}
+
+#quest-list-panel.height-limited .sl-body {
+    max-height: none !important;
+}
+
+#quest-list-panel .sl-item:not(.selected) {
+    background-color: transparent;
+}
+
+#quest-list-panel[data-collapsed="false"] .sl-items-list {
+    padding-bottom: 40px;
+}
+
+#quest-list-panel .sl-items-list {
+    max-height: none !important;
+}
+
+#workshop-list-panel {
+    min-width: 350px;
+    max-width: 500px;
+    width: max-content;
+    max-height: 402px;
+}
+
+#workshop-list-panel[data-collapsed="true"] {
+    max-height: 402px;
+}
+
+#workshop-list-panel[data-collapsed="false"] {
+    height: 402px;
+}
+
+#workshop-list-panel .sl-body {
+    height: calc(100% - 30px);
+}
+
+#quest-card-panel {
+    min-width: 380px;
+    max-width: 500px;
+    width: max-content;
+    max-height: 520px;
+}
+
+#settlement-card-panel {
+    min-width: 280px;
+    max-width: 400px;
+    width: max-content;
+}
+
+#marker-card-panel {
+    min-width: 260px;
+    max-width: 400px;
+    width: max-content;
+}
+
+#custom-marker-card-panel {
+    min-width: 300px;
+    max-width: 450px;
+    width: max-content;
+}
+
+#marker-card-panel .fc-header,
+#custom-marker-card-panel .fc-header {
+    justify-content: center;
+}
+
+#info-card,
+.floating-card,
+.collapsible-panel {
+    zoom: var(--ui-scale, 1.0);
+}
+
+#info-card {
+    transform-origin: bottom right;
+}
+
+[data-dock="top-left"] { transform-origin: top left; }
+[data-dock="top-right"] { transform-origin: top right; }
+[data-dock="bottom-left"] { transform-origin: bottom left; }
+[data-dock="bottom-right"] { transform-origin: bottom right; }
+.floating-card:not([data-dock]) { transform-origin: top left; }
+body.disable-bold * { font-weight: normal !important; }
+body.disable-condensed { --main-font: 'Piboto', sans-serif; }
+
+/* ==========================================================================
+   CONTROLLER MODE OVERRIDES
+   ========================================================================== */
+body.controller-active #settings-bar,
+body.controller-active #info-bar,
+body.controller-active #control-bar,
+body.controller-active #info-card,
+body.controller-active #quest-list-panel,
+body.controller-active #workshop-list-panel,
+body.controller-active #search-panel,
+body.controller-active .floating-card,
+body.controller-active .collapsible-panel,
+body.controller-active #settings-menu-panel,
+body.controller-active #settings-backdrop {
+    pointer-events: none !important;
+}
+
+body.controller-active #custom-cursor {
+    z-index: 50 !important;
+}
